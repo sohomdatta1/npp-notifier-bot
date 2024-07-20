@@ -2,13 +2,18 @@ import json
 import requests as r
 import re
 from notify import send_notification
+import json
 from sseclient import SSEClient as EventSource
+import datetime
+import os
+LEEND_DATE = datetime.datetime.now() - datetime.timedelta(days=2*365)
+
+CURRENT_USERS_TO_BE_NOTIFIED = json.load(open(os.environ.get('TOOL_DATA_DIR') + '/NPP_users_to_notify.json'))
 
 API_URL = 'https://en.wikipedia.org/w/api.php'
 EVENTSTREAM_URL = 'https://stream.wikimedia.org/v2/stream/recentchange'
 
 AFD_ARTICLE_EXTRACTION_REGEX = r'''===\[\[:([^\]]+)\]\]===\n{{REMOVE THIS TEMPLATE WHEN CLOSING THIS AfD'''
-SHOULD_NOT_SEND_NOTIF = r'''({{[Nn]obots}}|\[\[Category:Wikipedians who opt out of message delivery|{{User:SodiumBot/NoNPPDelivery}})'''
 
 def get_reviewer(pagename):
     actions = ["pagetriage-curation/reviewed-article", "pagetriage-curation/reviewed"]
@@ -51,6 +56,7 @@ def parse_wikitext_and_get_page(revid):
         "revids": revid,
         "formatversion": "2",
         "rvprop": "content",
+        "leend": LEEND_DATE.strftime('%Y-%m-%dT%H:%M:%SZ'),
         "rvslots": "main"
     }
     
@@ -66,42 +72,6 @@ def parse_wikitext_and_get_page(revid):
             return None
     else:
         return None
-    
-def get_page_wikitext(pagename):
-    parameters = {
-        "action": "query",
-        "format": "json",
-        "prop": "revisions",
-        "titles": pagename,
-        "formatversion": "2",
-        "rvprop": "content",
-        "rvslots": "main"
-    }
-    
-    response = r.post(API_URL, data=parameters, headers={'X-User-Agent': 'AFD_NPP_Notifier_Bot/1.0'}, timeout=10)
-    if response.status_code == 200:
-        try:
-            queryjson = response.json()
-            return queryjson['query']['pages'][0]['revisions'][0]['slots']['main']['content']
-        except Exception as e:
-            print(e)
-            return None
-    else:
-        return None
-    
-def filter_notify(list_users, nominator, page_name):
-    PREVIOUS_NOTIF = r'''(==Nomination of \[\[:''' + page_name + r'''\]\] for deletion==|==Deletion discussion about \[\[''' + page_name + r'''\]\]==)'''
-    users_to_notify = []
-    for user in list_users:
-        if user == nominator:
-            continue
-        talk_page_wikitext = get_page_wikitext('User talk:' + user)
-        if re.search(SHOULD_NOT_SEND_NOTIF, talk_page_wikitext, re.DOTALL | re.MULTILINE):
-            continue
-        if re.search(PREVIOUS_NOTIF, talk_page_wikitext, re.DOTALL | re.MULTILINE):
-            continue
-        users_to_notify.append(user)
-    return users_to_notify
 
 
 for event in EventSource(EVENTSTREAM_URL, last_id=None):
@@ -119,7 +89,13 @@ for event in EventSource(EVENTSTREAM_URL, last_id=None):
                     page_name = parse_wikitext_and_get_page(change['revision']['new'])
                     if page_name:
                         list_users = get_reviewer(page_name)
-                        list_users = filter_notify(list_users, change['user'], change['title'])
+                        list_users = list(set(list_users))
+                        list_of_notifications = CURRENT_USERS_TO_BE_NOTIFIED
                         for user in list_users:
-                            send_notification(user, page_name, change['title'])
+                            list_of_notifications.append({
+                                "user": user,
+                                'page_name': page_name,
+                                'afd_link': change['title']
+                            })
                     print(event.id)
+                    json.dump(list_of_notifications, open(os.environ.get('TOOL_DATA_DIR') + '/NPP_users_to_notify.json', 'w', encoding='utf-8'))

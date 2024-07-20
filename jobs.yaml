@@ -1,0 +1,14 @@
+# https://wikitech.wikimedia.org/wiki/Help:Toolforge/Jobs_framework
+---
+- name: "listenforafd"
+  command: "launcher listenforafd"
+  image: tool-sodium-bot/tool-sodium-bot:latest
+  continuous: true
+  mount: all
+  emails: all
+- name: "notifynpp"
+  command: "launcher notifynpp"
+  image: tool-sodium-bot/tool-sodium-bot:latest
+  schedule: "@daily"
+  mount: all
+  emails: all
