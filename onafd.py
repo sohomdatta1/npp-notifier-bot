@@ -90,7 +90,7 @@ def get_page_wikitext(pagename):
         return None
     
 def filter_notify(list_users, nominator, page_name):
-    PREVIOUS_NOTIF = r'''==Nomination of \[\[:''' + page_name + r'''\]\] for deletion=='''
+    PREVIOUS_NOTIF = r'''(==Nomination of \[\[:''' + page_name + r'''\]\] for deletion==|==Deletion discussion about \[\[''' + page_name + r'''\]\]==)'''
     users_to_notify = []
     for user in list_users:
         if user == nominator:
