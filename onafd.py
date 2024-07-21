@@ -6,6 +6,7 @@ import json
 from sseclient import SSEClient as EventSource
 import datetime
 import os
+from toolsdb import get_conn
 LEEND_DATE = datetime.datetime.now() - datetime.timedelta(days=2*365)
 
 CURRENT_USERS_TO_BE_NOTIFIED = json.load(open(os.environ.get('TOOL_DATA_DIR') + '/NPP_users_to_notify.json'))
@@ -98,4 +99,11 @@ for event in EventSource(EVENTSTREAM_URL, last_id=None):
                                 'afd_link': change['title']
                             })
                     print(event.id)
-                    json.dump(list_of_notifications, open(os.environ.get('TOOL_DATA_DIR') + '/NPP_users_to_notify.json', 'w', encoding='utf-8'))
+                    with get_conn() as conn:
+                        with conn.cursor() as cur:
+                            for notification in list_of_notifications:
+                                cur.execute(
+                                    "INSERT INTO npp_notifications (user_name, page_name, afd_link) VALUES (%s, %s, %s)", 
+                                    (notification['user'], notification['page_name'], notification['afd_link'])
+                                )
+                            conn.commit()

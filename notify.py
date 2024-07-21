@@ -3,6 +3,7 @@ import os
 import json
 import re
 import requests as r
+from toolsdb import get_conn
 
 API_URL = 'https://en.wikipedia.org/w/api.php'
 SHOULD_NOT_SEND_NOTIF = r'''({{[Nn]obots}}|\[\[Category:Wikipedians who opt out of message delivery|{{User:SodiumBot/NoNPPDelivery}})'''
@@ -56,8 +57,10 @@ def notify(username, message):
         user_talk_page.save("Notifying new page reviewer of AFD nomination")
     return True
 
-
-list_notifications = json.loads(os.environ.get('TOOL_DATA_DIR') + '/NPP_users_to_notify.json')
-list_notifications = filter(filter_notify, list_notifications)
-for notifications in list_notifications:
-    send_notification(notifications['user'], notifications['page_name'], notifications['afd_link'])
+with get_conn() as conn:
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT * FROM `npp_notifications` WHERE timestamp >= NOW() - INTERVAL 1 HOUR')
+        list_notifications = cursor.fetchall()
+        list_notifications = filter(filter_notify, list_notifications)
+        for notifications in list_notifications:
+            send_notification(notifications['user'], notifications['page_name'], notifications['afd_link'])

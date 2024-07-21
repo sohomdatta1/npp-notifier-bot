@@ -1,3 +1,4 @@
 pywikibot
 requests
 sseclient
+pymysql
