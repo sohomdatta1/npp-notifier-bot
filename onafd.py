@@ -1,7 +1,6 @@
 import json
 import requests as r
 import re
-from notify import send_notification
 import json
 from sseclient import SSEClient as EventSource
 import datetime

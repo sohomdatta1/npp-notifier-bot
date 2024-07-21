@@ -9,6 +9,6 @@
 - name: "notifynpp"
   command: "launcher notifynpp"
   image: tool-sodium-bot/tool-sodium-bot:latest
-  schedule: "@daily"
+  schedule: "@hourly"
   mount: all
   emails: all
