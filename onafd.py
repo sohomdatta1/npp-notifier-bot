@@ -9,8 +9,6 @@ import os
 from toolsdb import get_conn
 LEEND_DATE = datetime.datetime.now() - datetime.timedelta(days=2*365)
 
-CURRENT_USERS_TO_BE_NOTIFIED = json.load(open(os.environ.get('TOOL_DATA_DIR') + '/NPP_users_to_notify.json'))
-
 API_URL = 'https://en.wikipedia.org/w/api.php'
 EVENTSTREAM_URL = 'https://stream.wikimedia.org/v2/stream/recentchange'
 
@@ -91,7 +89,7 @@ for event in EventSource(EVENTSTREAM_URL, last_id=None):
                     if page_name:
                         list_users = get_reviewer(page_name)
                         list_users = list(set(list_users))
-                        list_of_notifications = CURRENT_USERS_TO_BE_NOTIFIED
+                        list_of_notifications = []
                         for user in list_users:
                             list_of_notifications.append({
                                 "user": user,
