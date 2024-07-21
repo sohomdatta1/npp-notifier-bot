@@ -8,7 +8,7 @@ from toolsdb import get_conn
 API_URL = 'https://en.wikipedia.org/w/api.php'
 SHOULD_NOT_SEND_NOTIF = r'''({{[Nn]obots}}|\[\[Category:Wikipedians who opt out of message delivery|{{User:SodiumBot/NoNPPDelivery}})'''
 
-msg_text = "==Nomination of [[:ArticleName]] for deletion==\n{{subst:User:SodiumBot/ReviewerAfdNotification|article=ArticleName|afd=ArticleForDeletionDiscussionLink}} ~~~~"
+msg_text = "==Nomination of [[:ArticleName]] for deletion==\n{{subst:User:SodiumBot/ReviewerAfdNotification|article=ArticleName|afd=ArticleForDeletionDiscussionLink}}"
 
 
 def get_page_wikitext(pagename):
