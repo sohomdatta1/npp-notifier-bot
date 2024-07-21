@@ -5,7 +5,7 @@ def init_db():
     initdbconn = sql.connections.Connection(user=config['username'], password=config['password'], host=config['host'])
     with initdbconn.cursor() as cursor:
         cursor.execute(f'CREATE DATABASE IF NOT EXISTS {config["username"]}__sodiumbotdb;')
-        cursor.execute(f'USE {config["username"]}__match_and_split;')
+        cursor.execute(f'USE {config["username"]}__sodiumbotdb;')
         cursor.execute('''CREATE TABLE IF NOT EXISTS `npp_notifications` (
             `id` INT NOT NULL AUTO_INCREMENT,
             `page_name` VARCHAR(255) NOT NULL,
