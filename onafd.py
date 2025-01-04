@@ -46,24 +46,24 @@ def get_reviewer(pagename):
         return []
 
 def parse_wikitext_and_get_page(revid):
-
+    print('REV: ', revid)
     parameters = {
-        "action": "query",
+        "action": "parse",
         "format": "json",
-        "prop": "revisions",
-        "revids": revid,
+        "oldid": revid,
         "formatversion": "2",
-        "rvprop": "content",
-        "leend": LEEND_DATE.strftime('%Y-%m-%dT%H:%M:%SZ'),
-        "rvslots": "main"
+        "prop": "wikitext",
+        #"leend": LEEND_DATE.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        #"rvslots": "main"
     }
     
     response = r.post(API_URL, data=parameters, headers={'X-User-Agent': 'AFD_NPP_Notifier_Bot/1.0'}, timeout=10)
     if response.status_code == 200:
         try:
             queryjson = response.json()
-            wikitext = queryjson['query']['pages'][0]['revisions'][0]['slots']['main']['content']
-            retitle = re.search(AFD_ARTICLE_EXTRACTION_REGEX, wikitext, re.MULTILINE | re.DOTALL)
+            wikitext = queryjson['parse']['wikitext']
+            print(wikitext)
+            retitle = re.search(AFD_ARTICLE_EXTRACTION_REGEX, wikitext, re.MULTILINE)
             return retitle.group(1)
         except Exception as e:
             print(e)
@@ -82,8 +82,9 @@ for event in EventSource(EVENTSTREAM_URL, last_id=None):
             # discard canary events
             if change['meta']['domain'] == 'canary':
                 continue
-            if change['wiki'] == 'enwiki':
+            if change['wiki'] == 'enwiki' or change['wiki'] == 'testwiki':
                 if 'Wikipedia:Articles for deletion/' in change['title'] and change['type'] == 'new':
+                    print(change)
                     page_name = parse_wikitext_and_get_page(change['revision']['new'])
                     if page_name:
                         list_users = get_reviewer(page_name)
