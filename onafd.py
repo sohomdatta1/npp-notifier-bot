@@ -8,7 +8,7 @@ import os
 from toolsdb import get_conn
 LEEND_DATE = datetime.datetime.now() - datetime.timedelta(days=2*365)
 
-API_URL = 'https://en.wikipedia.org/w/api.php'
+API_URL = 'https://test.wikipedia.org/w/api.php'
 EVENTSTREAM_URL = 'https://stream.wikimedia.org/v2/stream/recentchange'
 
 AFD_ARTICLE_EXTRACTION_REGEX = r'''===\[\[:([^\]]+)\]\]===\n{{REMOVE THIS TEMPLATE WHEN CLOSING THIS AfD'''
@@ -91,6 +91,7 @@ for event in EventSource(EVENTSTREAM_URL, last_id=None):
                         list_users = list(set(list_users))
                         list_of_notifications = []
                         for user in list_users:
+                            print('To notify: ', user)
                             list_of_notifications.append({
                                 "user": user,
                                 'page_name': page_name,
