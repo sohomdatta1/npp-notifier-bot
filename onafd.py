@@ -97,12 +97,12 @@ for event in EventSource(EVENTSTREAM_URL, last_id=None):
                                 'page_name': page_name,
                                 'afd_link': change['title']
                             })
-                    print(event.id)
-                    with get_conn() as conn:
-                        with conn.cursor() as cur:
-                            for notification in list_of_notifications:
-                                cur.execute(
-                                    "INSERT INTO npp_notifications (user_name, page_name, afd_link) VALUES (%s, %s, %s)", 
-                                    (notification['user'], notification['page_name'], notification['afd_link'])
-                                )
-                            conn.commit()
+                        print(event.id)
+                        with get_conn() as conn:
+                            with conn.cursor() as cur:
+                                for notification in list_of_notifications:
+                                    cur.execute(
+                                        "INSERT INTO npp_notifications (username, page_name, afd_link) VALUES (%s, %s, %s)", 
+                                        (notification['user'], notification['page_name'], notification['afd_link'])
+                                    )
+                                conn.commit()
