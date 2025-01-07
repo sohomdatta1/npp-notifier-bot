@@ -8,7 +8,7 @@ import os
 from toolsdb import get_conn
 LEEND_DATE = datetime.datetime.now() - datetime.timedelta(days=2*365)
 
-API_URL = 'https://test.wikipedia.org/w/api.php'
+API_URL = 'https://en.wikipedia.org/w/api.php'
 EVENTSTREAM_URL = 'https://stream.wikimedia.org/v2/stream/recentchange'
 
 AFD_ARTICLE_EXTRACTION_REGEX = r'''===\[\[:([^\]]+)\]\]===\n{{REMOVE THIS TEMPLATE WHEN CLOSING THIS AfD'''
