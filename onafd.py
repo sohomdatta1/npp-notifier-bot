@@ -71,9 +71,7 @@ def parse_wikitext_and_get_page(revid):
     else:
         return None
 
-print("START!")
 for event in EventSource(EVENTSTREAM_URL, last_id=None):
-    print("ITERATING!")
     if event.event == 'message':
         try:
             change = json.loads(event.data)
