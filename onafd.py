@@ -97,6 +97,7 @@ for event in EventSource(EVENTSTREAM_URL, last_id=None):
                                 'page_name': page_name,
                                 'afd_link': change['title']
                             })
+                        print("List of folks to notify:", list_of_notifications)
                         print(event.id)
                         with get_conn() as conn:
                             with conn.cursor() as cur:
@@ -105,4 +106,5 @@ for event in EventSource(EVENTSTREAM_URL, last_id=None):
                                         "INSERT INTO npp_notifications (username, page_name, afd_link) VALUES (%s, %s, %s)", 
                                         (notification['user'], notification['page_name'], notification['afd_link'])
                                     )
-                                conn.commit()
+                                print("Commiting")
+                            conn.commit()
