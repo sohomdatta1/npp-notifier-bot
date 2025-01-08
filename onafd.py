@@ -83,11 +83,12 @@ for event in EventSource(EVENTSTREAM_URL, last_id=None):
                 continue
             if change['wiki'] == 'enwiki' or change['wiki'] == 'testwiki':
                 if 'Wikipedia:Articles for deletion/' in change['title'] and change['type'] == 'new':
-                    print(change)
                     page_name = parse_wikitext_and_get_page(change['revision']['new'])
+                    user = change['user']
                     if page_name:
                         list_users = get_reviewer(page_name)
                         list_users = list(set(list_users))
+                        while user in list_users: list_users.remove(user)
                         list_of_notifications = []
                         for user in list_users:
                             print('To notify: ', user)
