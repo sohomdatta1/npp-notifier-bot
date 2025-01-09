@@ -14,6 +14,7 @@ def init_db():
             `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`)
         )''')
+    initdbconn.commit()
     initdbconn.close()
     
 def get_conn():
