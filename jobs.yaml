@@ -12,3 +12,7 @@
   schedule: "@hourly"
   mount: all
   emails: all
+- name: test
+  command: "launcher test"
+  image: tool-sodium-bot/tool-sodium-bot:latest
+  mount: all
